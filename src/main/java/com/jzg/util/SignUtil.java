@@ -2,6 +2,7 @@ package com.jzg.util;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.jzg.api.dto.request.GetMakeByAllRequestBody;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -58,14 +59,14 @@ public class SignUtil {
 //        jzg.api.base-url=http://nvapi.sandbox.jingzhengu.com
 //        jzg.api.partner-id=1010
 //        jzg.api.secret-key=Bg3pyUZrU6skS89m0URfFvNJ
-        GetMakeByAllRequest plainBodyRequest = GetMakeByAllRequest.builder()
+        GetMakeByAllRequestBody plainBodyRequest = GetMakeByAllRequestBody.builder()
                 .vehicleClassification(1).produceStatus(1).isEstimate(0).includeElectrombile(1).build();
 
         JSONObject paramsJson = (JSONObject) JSON.toJSON(plainBodyRequest);
         String url = "http://nvapi.sandbox.jingzhengu.com/external/getMakeByAll";
         String result = callJavaApi(url, partnerId, key, paramsJson);
         if (result != null && !"".equals(result.trim())) {
-            JSONObject parse = JSONObject.parseObject(result);
+            JSONObject parse = JSONObjeparseObject(result);
             String body = parse.get("body").toString();
             System.out.println("body===>"+getDecodeBodyMessage(body, key));
         }
