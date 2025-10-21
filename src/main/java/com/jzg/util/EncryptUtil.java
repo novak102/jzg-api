@@ -1,8 +1,7 @@
 package com.jzg.util;
 
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
-
+// 导入 java.util.Base64 替换 sun.misc.*
+import java.util.Base64;
 import javax.crypto.*;
 import javax.crypto.spec.DESedeKeySpec;
 import java.io.UnsupportedEncodingException;
@@ -12,126 +11,46 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 
+/**
+ * 加密工具类 (整合自您提供的 EncryptUtil 和 SignUtil)
+ */
 public class EncryptUtil {
 
     /**
-     * MD5值计算<p>
-     * MD5的算法在RFC1321 中定义:
-     * 在RFC 1321中，给出了Test suite用来检验你的实现是否正确：
-     * MD5 ("") = d41d8cd98f00b204e9800998ecf8427e
-     * MD5 ("a") = 0cc175b9c0f1b6a831c399e269772661
-     * MD5 ("abc") = 900150983cd24fb0d6963f7d28e17f72
-     * MD5 ("message digest") = f96b697d7cb7938d525a2f31aaf161d0
-     * MD5 ("abcdefghijklmnopqrstuvwxyz") = c3fcd3d76192e4007dfb496cca67e13b
-     *
-     * @param str 源字符串
-     * @return md5值
+     * MD5值计算
+     * (来自您的原始文件)
      */
     public final static byte[] MD5(String str) {
         try {
             byte[] res = str.getBytes("UTF-8");
             MessageDigest mdTemp = MessageDigest.getInstance("MD5".toUpperCase());
             mdTemp.update(res);
-            byte[] hash = mdTemp.digest();
-            return hash;
+            return mdTemp.digest();
         } catch (Exception e) {
             return null;
         }
     }
 
-
-    // 加密后解密
-    public static String JM(byte[] inStr) {
-        String newStr = new String(inStr);
-        char[] a = newStr.toCharArray();
-        for (int i = 0; i < a.length; i++) {
-            a[i] = (char) (a[i] ^ 't');
-        }
-        String k = new String(a);
-        return k;
-    }
-
-
     /**
-     * BASE64加密
-     *
-     * @param key
-     * @return
-     * @throws Exception
+     * 3DES加密
+     * (来自您的原始文件)
      */
-    public static String BASE64Encrypt(byte[] key) {
-        String edata = null;
-        try {
-            edata = (new BASE64Encoder()).encodeBuffer(key).trim();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return edata.replaceAll("\r|\n", "");
-    }
-
-
-    /**
-     * BASE64解密
-     *
-     * @param data key
-     * @return
-     * @throws Exception
-     */
-    public static byte[] BASE64Decrypt(String data) {
-        if (data == null) {
-            return null;
-        }
-        byte[] edata = null;
-        try {
-            edata = (new BASE64Decoder()).decodeBuffer(data);
-            return edata;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    /**
-     * @param key 24位密钥
-     * @param str 源字符串
-     * @return
-     * @throws NoSuchAlgorithmException
-     * @throws NoSuchPaddingException
-     * @throws InvalidKeyException
-     * @throws UnsupportedEncodingException
-     * @throws InvalidKeySpecException
-     * @throws IllegalBlockSizeException
-     * @throws BadPaddingException
-     */
-    public static byte[] DES3Encrypt(String key, String str) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, UnsupportedEncodingException, InvalidKeySpecException, IllegalBlockSizeException, BadPaddingException {
-
+    public static byte[] DES3Encrypt(String key, String str) throws NoSuchAlgorithmException,
+            NoSuchPaddingException, InvalidKeyException, UnsupportedEncodingException,
+            InvalidKeySpecException, IllegalBlockSizeException, BadPaddingException {
         byte[] newkey = key.getBytes();
-
         SecureRandom sr = new SecureRandom();
-
         DESedeKeySpec dks = new DESedeKeySpec(newkey);
-
         SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DESede");
-
         SecretKey securekey = keyFactory.generateSecret(dks);
-
         Cipher cipher = Cipher.getInstance("DESede/ECB/PKCS5Padding");
-
         cipher.init(Cipher.ENCRYPT_MODE, securekey, sr);
-
-        byte[] bt = cipher.doFinal(str.getBytes("utf-8"));
-
-        return bt;
+        return cipher.doFinal(str.getBytes("utf-8"));
     }
 
-
     /**
-     * 解密
-     *
-     * @param edata
-     * @param key
-     * @return
-     * @throws Exception
+     * 3DES解密
+     * (来自您的原始文件)
      */
     public static String DES3Decrypt(byte[] edata, String key) {
         String data = "";
@@ -153,9 +72,33 @@ public class EncryptUtil {
     }
 
     /**
-     * 生成请求接口签名
-     *
-     * @return
+     * BASE64加密 (已替换为 java.util.Base64)
+     */
+    public static String BASE64Encrypt(byte[] key) {
+        String edata = Base64.getEncoder().encodeToString(key).trim();
+        return edata.replaceAll("\r|\n", "");
+    }
+
+    /**
+     * BASE64解密 (已替换为 java.util.Base64)
+     */
+    public static byte[] BASE64Decrypt(String data) {
+        if (data == null) {
+            return null;
+        }
+        try {
+            return Base64.getDecoder().decode(data);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // --- 以下方法从 SignUtil.java 移入 ---
+
+    /**
+     * 加密签名 (来自您的 SignUtil.java)
+     * 签名规则: ToBase64 (Md5 (sequenceId + partner Id + operate + body + key))
      */
     public static String getSignature(String operate, String partnerId, String key, String encryptBody, String sequenceId) {
         StringBuffer str = new StringBuffer();
@@ -168,42 +111,23 @@ public class EncryptUtil {
     }
 
     /**
-     * 加密请求报文体
-     *
-     * @param body
-     * @return
+     * 加密请求报文体 (来自您的 EncryptUtil.java)
+     * 规则: ToBase64(3DES(Body明文))
      */
     public static String getBodyEncryption(String key, String body) {
-        //ToBase64(3DES(Body明文)
         try {
             return BASE64Encrypt(DES3Encrypt(key, body));
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (NoSuchPaddingException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        } catch (InvalidKeySpecException e) {
-            e.printStackTrace();
-        } catch (IllegalBlockSizeException e) {
-            e.printStackTrace();
-        } catch (BadPaddingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
 
     /**
-     * 解密返回的报文体body
-     *
-     * @param body
-     * @param key
-     * @return
+     * 解密返回的报文体body (来自您的 SignUtil.java)
+     * 规则: Decrypt3DES(FromBase64(Body密文))
      */
     public static String getDecodeBodyMessage(String body, String key) {
-        //Decrypt3DES(FromBase64 (Body密文)
         return DES3Decrypt(BASE64Decrypt(body), key);
     }
 }
