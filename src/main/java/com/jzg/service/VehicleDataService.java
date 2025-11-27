@@ -39,7 +39,7 @@ public class VehicleDataService {
         String apiPath = "/external/getMakeByAll"; // 4.1 接口地址
 
         // 2. 定义期望的返回类型 (List<MakeDto>)
-        TypeReference<List<MakeDto>> typeRef = new TypeReference<>() {};
+        TypeReference<List<MakeDto>> typeRef = new TypeReference<List<MakeDto>>() {};
 
         // 3. 调用网关，获取明文响应
         return jzgApiService.post(apiPath, requestDto, typeRef);
@@ -62,7 +62,7 @@ public class VehicleDataService {
         String apiPath = "/external/getModels"; // 4.2 接口地址
 
         // 2. 定义期望的返回类型 (List<ModelDto>)
-        TypeReference<List<ModelDto>> typeRef = new TypeReference<>() {};
+        TypeReference<List<ModelDto>> typeRef = new TypeReference<List<ModelDto>>() {};
 
         // 3. 调用网关，获取明文响应
         return jzgApiService.post(apiPath, requestDto, typeRef);
